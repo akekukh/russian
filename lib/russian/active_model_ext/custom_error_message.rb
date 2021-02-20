@@ -41,18 +41,20 @@ if defined?(ActiveModel::Errors)
       #     ["Name is too short (minimum is 5 characters)", "Name can't be blank", "Address can't be blank"]
       def full_messages
         full_messages = []
-
-        each do |attribute, messages|
-          messages = Array.wrap(messages)
+  
+        errors.each do |error|
+          attribute = error.attribute
+  
+          messages = Array.wrap(error.message)
           next if messages.empty?
-
+  
           if attribute == :base
             messages.each {|m| full_messages << m }
           else
             attr_name = attribute.to_s.gsub('.', '_').humanize
             attr_name = @base.class.human_attribute_name(attribute, :default => attr_name)
             options = { :attribute => attr_name, :default => "%{attribute} %{message}" }
-
+  
             messages.each do |m|
               if m =~ /^\^/
                 full_messages << m[1..-1]
@@ -62,7 +64,7 @@ if defined?(ActiveModel::Errors)
             end
           end
         end
-
+  
         full_messages
       end
     end
